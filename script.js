@@ -4,6 +4,7 @@ const sehirInput = document.getElementById("sehir");
 const btn = document.getElementById("btn");
 const statusEl = document.getElementById("status");
 const sonucEl = document.getElementById("sonuc");
+const weatherAnimEl = document.getElementById("weatherAnim");
 
 btn.addEventListener("click", havaDurumuGetir);
 sehirInput.addEventListener("keydown", (e) => { if (e.key === "Enter") havaDurumuGetir(); });
@@ -17,7 +18,8 @@ async function havaDurumuGetir() {
   }
 
   btn.disabled = true;
-  statusEl.textContent = "Yükleniyor...";
+  statusEl.innerHTML = `<span class="spinner"></span>Yükleniyor...`;
+  setWeatherBackground(null);
 
   try {
     const res = await fetch(WEBHOOK_URL, {
@@ -47,15 +49,35 @@ async function havaDurumuGetir() {
     }
 
     statusEl.innerHTML = `<span class="ok">Başarılı ✓</span>`;
+    const tempEmoji = s <= 0 ? "❄️" : (s < 15 ? "🌥️" : (s < 28 ? "🌤️" : "🔥"));
+    const windEmoji = r > 40 ? "🌬️" : "🍃";
     sonucEl.innerHTML = `
-      <strong>${data.sehir}</strong> için hava durumu:<br/><br/>
-      🌡️ Sıcaklık: ${s} °C<br/>
-      💨 Rüzgar: ${r} km/h
+      <div class="result" style="--delay:0ms">
+        <div style="font-weight:700; font-size:18px; margin-bottom:6px;">${tempEmoji} ${data.sehir}</div>
+        <div>🌡️ Sıcaklık: <strong>${s} °C</strong></div>
+        <div>${windEmoji} Rüzgar: <strong>${r} km/h</strong></div>
+      </div>
     `;
+    const mood = pickWeatherMood(s, r);
+    setWeatherBackground(mood);
   } catch (err) {
     console.error(err);
     statusEl.innerHTML = `<span class="err">İstek başarısız. Konsolu kontrol et.</span>`;
   } finally {
     btn.disabled = false;
   }
+}
+
+function pickWeatherMood(temp, wind){
+  if (temp <= 0) return 'snowy';
+  if (wind > 35) return 'rainy';
+  if (temp < 15) return 'cloudy';
+  return 'sunny';
+}
+
+function setWeatherBackground(mood){
+  if(!weatherAnimEl) return;
+  weatherAnimEl.className = 'weather-anim';
+  if(!mood) return;
+  weatherAnimEl.classList.add(mood);
 }
