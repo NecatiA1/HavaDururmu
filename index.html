@@ -1,37 +1,46 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hava Durumu</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hava Durumu</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Hava durumuna göre arka plan animasyon katmanı -->
-  <div id="weatherAnim" class="weather-anim" aria-hidden="true"></div>
-  <!-- Hareketli arka plan ikonları -->
-  <div class="bg-anim" aria-hidden="true">
-    <span>☁️</span>
-    <span>🌧️</span>
-    <span>⛅</span>
-    <span>❄️</span>
-    <span>🌤️</span>
-  </div>
+    <div class="container">
+        <!-- Üst kısım - Arama kutusu -->
+        <div class="search-container">
+            <input type="text" id="cityInput" placeholder="Şehir adını girin...">
+            <button id="searchBtn" onclick="getWeather()">Ara</button>
+        </div>
 
-  <div class="card">
-    <h1>🌍 Hava Durumu</h1>
-    <p class="tagline">Şehrini yaz, anlık durumu öğren.</p>
-    <div class="row">
-      <input id="sehir" placeholder="Şehir gir (ör. Ankara)" />
-      <button id="btn">Göster</button>
+        <!-- Orta kısım - Şehir adı -->
+        <div class="city-display">
+            <h2 id="cityName">Şehir seçin</h2>
+        </div>
+
+        <!-- Alt kısım - 3 veri kutusu -->
+        <div class="weather-data">
+            <div class="data-box">
+                <h3>Sıcaklık</h3>
+                <div class="data-value" id="temperature">--°C</div>
+            </div>
+            <div class="data-box">
+                <h3>Nem</h3>
+                <div class="data-value" id="humidity">--%</div>
+            </div>
+            <div class="data-box">
+                <h3>Rüzgar</h3>
+                <div class="data-value" id="windSpeed">-- km/h</div>
+            </div>
+        </div>
+
+        <!-- Hata mesajı -->
+        <div id="errorMessage" class="error-message" style="display: none;">
+            Şehir bulunamadı. Lütfen tekrar deneyin.
+        </div>
     </div>
-    <div id="status"></div>
-    <div id="sonuc"></div>
-  </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,83 +1,129 @@
-const WEBHOOK_URL = "https://gimli-stage.odealapp.com/api/v1/webhooks/1NLitSiGDNBAEbLy4UJID/sync"; // <-- kendi URL'ini koy
+// API anahtarı - OpenWeatherMap'ten ücretsiz alabilirsiniz
+const API_KEY = 'YOUR_API_KEY'; // Buraya OpenWeatherMap API anahtarınızı ekleyin
+const API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
-const sehirInput = document.getElementById("sehir");
-const btn = document.getElementById("btn");
-const statusEl = document.getElementById("status");
-const sonucEl = document.getElementById("sonuc");
-const weatherAnimEl = document.getElementById("weatherAnim");
+// DOM elementleri
+const cityInput = document.getElementById('cityInput');
+const searchBtn = document.getElementById('searchBtn');
+const cityName = document.getElementById('cityName');
+const temperature = document.getElementById('temperature');
+const humidity = document.getElementById('humidity');
+const windSpeed = document.getElementById('windSpeed');
+const errorMessage = document.getElementById('errorMessage');
 
-btn.addEventListener("click", havaDurumuGetir);
-sehirInput.addEventListener("keydown", (e) => { if (e.key === "Enter") havaDurumuGetir(); });
+// Enter tuşu ile arama
+cityInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        getWeather();
+    }
+});
 
-async function havaDurumuGetir() {
-  const sehir = (sehirInput.value || "").trim();
-  sonucEl.innerHTML = "";
-  if (!sehir) {
-    statusEl.innerHTML = `<span class="err">Şehir boş olamaz.</span>`;
-    return;
-  }
-
-  btn.disabled = true;
-  statusEl.innerHTML = `<span class="spinner"></span>Yükleniyor...`;
-  setWeatherBackground(null);
-
-  try {
-    const res = await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sehir })
-    });
-
-    if (!res.ok) {
-      statusEl.innerHTML = `<span class="err">Sunucu hatası: ${res.status}</span>`;
-      btn.disabled = false;
-      return;
+// Hava durumu verilerini getir
+async function getWeather() {
+    const city = cityInput.value.trim();
+    
+    if (!city) {
+        showError('Lütfen şehir adını girin!');
+        return;
     }
 
-    const data = await res.json();
-    console.log("Gelen:", data);
-
-    // Activepieces’ten dönen alanlar:
-    // { sehir: "...", sicaklik: <num veya "str">, ruzgar: <num veya "str"> }
-    const s = Number(data.sicaklik);
-    const r = Number(data.ruzgar);
-
-    if (!data.sehir || Number.isNaN(s) || Number.isNaN(r)) {
-      statusEl.innerHTML = `<span class="err">Veri alınamadı veya beklenen formatta değil.</span>`;
-      btn.disabled = false;
-      return;
+    // API anahtarı kontrolü
+    if (API_KEY === 'YOUR_API_KEY') {
+        showDemo(city);
+        return;
     }
 
-    statusEl.innerHTML = `<span class="ok">Başarılı ✓</span>`;
-    const tempEmoji = s <= 0 ? "❄️" : (s < 15 ? "🌥️" : (s < 28 ? "🌤️" : "🔥"));
-    const windEmoji = r > 40 ? "🌬️" : "🍃";
-    sonucEl.innerHTML = `
-      <div class="result" style="--delay:0ms">
-        <div style="font-weight:700; font-size:18px; margin-bottom:6px;">${tempEmoji} ${data.sehir}</div>
-        <div>🌡️ Sıcaklık: <strong>${s} °C</strong></div>
-        <div>${windEmoji} Rüzgar: <strong>${r} km/h</strong></div>
-      </div>
-    `;
-    const mood = pickWeatherMood(s, r);
-    setWeatherBackground(mood);
-  } catch (err) {
-    console.error(err);
-    statusEl.innerHTML = `<span class="err">İstek başarısız. Konsolu kontrol et.</span>`;
-  } finally {
-    btn.disabled = false;
-  }
+    try {
+        showLoading();
+        
+        const response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric&lang=tr`);
+        
+        if (!response.ok) {
+            throw new Error('Şehir bulunamadı');
+        }
+        
+        const data = await response.json();
+        displayWeatherData(data);
+        hideError();
+        
+    } catch (error) {
+        showError('Şehir bulunamadı. Lütfen tekrar deneyin.');
+        hideLoading();
+    }
 }
 
-function pickWeatherMood(temp, wind){
-  if (temp <= 0) return 'snowy';
-  if (wind > 35) return 'rainy';
-  if (temp < 15) return 'cloudy';
-  return 'sunny';
+// Hava durumu verilerini göster
+function displayWeatherData(data) {
+    cityName.textContent = data.name + ', ' + data.sys.country;
+    temperature.textContent = Math.round(data.main.temp) + '°C';
+    humidity.textContent = data.main.humidity + '%';
+    windSpeed.textContent = Math.round(data.wind.speed * 3.6) + ' km/h'; // m/s'den km/h'ye çevir
+    
+    hideLoading();
 }
 
-function setWeatherBackground(mood){
-  if(!weatherAnimEl) return;
-  weatherAnimEl.className = 'weather-anim';
-  if(!mood) return;
-  weatherAnimEl.classList.add(mood);
+// Demo veriler (API anahtarı yokken)
+function showDemo(city) {
+    cityName.textContent = city.charAt(0).toUpperCase() + city.slice(1);
+    temperature.textContent = Math.floor(Math.random() * 30 + 5) + '°C';
+    humidity.textContent = Math.floor(Math.random() * 60 + 30) + '%';
+    windSpeed.textContent = Math.floor(Math.random() * 20 + 5) + ' km/h';
+    
+    hideError();
+    hideLoading();
+    
+    // API anahtarı uyarısı
+    console.log('Demo modu: Gerçek hava durumu verisi için OpenWeatherMap API anahtarı gerekli.');
 }
+
+// Yükleniyor durumu
+function showLoading() {
+    temperature.textContent = '...';
+    humidity.textContent = '...';
+    windSpeed.textContent = '...';
+    searchBtn.disabled = true;
+    searchBtn.textContent = 'Yükleniyor...';
+}
+
+function hideLoading() {
+    searchBtn.disabled = false;
+    searchBtn.textContent = 'Ara';
+}
+
+// Hata mesajları
+function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    
+    // 3 saniye sonra gizle
+    setTimeout(() => {
+        hideError();
+    }, 3000);
+}
+
+function hideError() {
+    errorMessage.style.display = 'none';
+}
+
+// Sayfa yüklendiğinde input'a odaklan
+window.addEventListener('load', function() {
+    cityInput.focus();
+});
+
+// Popüler şehirler için otomatik tamamlama önerileri
+const popularCities = [
+    'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Konya', 
+    'Gaziantep', 'Mersin', 'Diyarbakır', 'Kayseri', 'Eskişehir', 'Urfa',
+    'Malatya', 'Erzurum', 'Van', 'Batman', 'Elazığ', 'Trabzon', 'Kocaeli'
+];
+
+// Basit otomatik tamamlama
+cityInput.addEventListener('input', function() {
+    const value = this.value.toLowerCase();
+    if (value.length > 1) {
+        const suggestions = popularCities.filter(city => 
+            city.toLowerCase().includes(value)
+        );
+        // Burada dropdown menü eklenebilir
+    }
+});
