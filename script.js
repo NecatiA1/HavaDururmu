@@ -5,6 +5,8 @@ const btn = document.getElementById("btn");
 const statusEl = document.getElementById("status");
 const sonucEl = document.getElementById("sonuc");
 const weatherAnimEl = document.getElementById("weatherAnim");
+const cityTitleEl = document.getElementById("cityTitle");
+const topbarEl = document.getElementById("topbar");
 
 btn.addEventListener("click", havaDurumuGetir);
 sehirInput.addEventListener("keydown", (e) => { if (e.key === "Enter") havaDurumuGetir(); });
@@ -51,13 +53,24 @@ async function havaDurumuGetir() {
     statusEl.innerHTML = `<span class="ok">Başarılı ✓</span>`;
     const tempEmoji = s <= 0 ? "❄️" : (s < 15 ? "🌥️" : (s < 28 ? "🌤️" : "🔥"));
     const windEmoji = r > 40 ? "🌬️" : "🍃";
+    cityTitleEl.textContent = `${data.sehir}`;
+    // 3 kutu: Durum, Sıcaklık, Rüzgar
     sonucEl.innerHTML = `
-      <div class="result" style="--delay:0ms">
-        <div style="font-weight:700; font-size:18px; margin-bottom:6px;">${tempEmoji} ${data.sehir}</div>
-        <div>🌡️ Sıcaklık: <strong>${s} °C</strong></div>
-        <div>${windEmoji} Rüzgar: <strong>${r} km/h</strong></div>
+      <div class="tile">
+        <div class="label">Durum</div>
+        <div class="value">${tempEmoji} ${pickLabelByTempWind(s, r)}</div>
+      </div>
+      <div class="tile">
+        <div class="label">Sıcaklık</div>
+        <div class="value">${s} °C</div>
+      </div>
+      <div class="tile">
+        <div class="label">Rüzgar</div>
+        <div class="value">${windEmoji} ${r} km/h</div>
       </div>
     `;
+    // Topbar'ı kompakt moda al
+    if(topbarEl) topbarEl.classList.add('compact');
     const mood = pickWeatherMood(s, r);
     setWeatherBackground(mood);
   } catch (err) {
@@ -80,4 +93,14 @@ function setWeatherBackground(mood){
   weatherAnimEl.className = 'weather-anim';
   if(!mood) return;
   weatherAnimEl.classList.add(mood);
+}
+
+function pickLabelByTempWind(temp, wind){
+  if (temp <= 0) return 'Karlı';
+  if (wind > 45) return 'Fırtınalı';
+  if (wind > 30) return 'Rüzgarlı';
+  if (temp < 10) return 'Serin';
+  if (temp < 20) return 'Ilık';
+  if (temp >= 30) return 'Sıcak';
+  return 'Açık';
 }

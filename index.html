@@ -4,32 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hava Durumu</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Hava durumuna göre arka plan animasyon katmanı -->
+  <!-- Hava durumuna göre arka plan animasyonu -->
   <div id="weatherAnim" class="weather-anim" aria-hidden="true"></div>
-  <!-- Hareketli arka plan ikonları -->
-  <div class="bg-anim" aria-hidden="true">
-    <span>☁️</span>
-    <span>🌧️</span>
-    <span>⛅</span>
-    <span>❄️</span>
-    <span>🌤️</span>
-  </div>
 
-  <div class="card">
-    <h1>🌍 Hava Durumu</h1>
-    <p class="tagline">Şehrini yaz, anlık durumu öğren.</p>
+  <!-- En üst arama barı -->
+  <div id="topbar" class="topbar">
     <div class="row">
       <input id="sehir" placeholder="Şehir gir (ör. Ankara)" />
-      <button id="btn">Göster</button>
+      <button id="btn">Ara</button>
     </div>
+  </div>
+
+  <!-- Sonuç paneli: başlık + 3 kutu -->
+  <div class="panel">
+    <h1 id="cityTitle" class="city-title">Hava Durumu</h1>
     <div id="status"></div>
-    <div id="sonuc"></div>
+    <div id="sonuc" class="tiles"></div>
   </div>
 
   <script src="script.js"></script>

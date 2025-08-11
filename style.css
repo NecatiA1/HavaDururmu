@@ -20,7 +20,7 @@ body {
   margin: 0;
   overflow: hidden;
   display: grid;
-  place-items: center center;
+  grid-template-rows: auto 1fr;
 }
 
 /* Yüzen hava ikonları (gizli) */
@@ -40,32 +40,28 @@ body {
   50% { transform: translateY(-18px) translateX(6px) rotate(3deg); }
 }
 
-/* Kart daha yukarıda konumlansın */
-.card {
-  position: relative;
-  z-index: 2;
-  margin-top: 0;
-  background: var(--card);
-  backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  padding: 28px;
-  border-radius: 16px;
-  border: 1px solid var(--stroke);
-  width: min(90vw, 1200px);
-  color: var(--text);
-  box-shadow: 0 20px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
-  transform: translateY(0);
-  animation: cardIn .7s cubic-bezier(.2,.8,.2,1);
+/* Topbar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(2,6,23,.65), rgba(2,6,23,.35));
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
-@keyframes cardIn { from { opacity: 0; transform: translateY(18px);} to { opacity: 1; transform: translateY(0);} }
-
-h1 { margin: 0 0 4px; font-size: clamp(22px, 4vw, 28px); text-align: center; }
-.tagline { margin: 2px 0 14px; color: var(--muted); font-size: 14px; text-align: center; }
-
-.row { display:flex; gap:10px; margin: 8px auto 16px; width: min(80vw, 1000px); }
+.topbar .row {
+  display: flex; gap: 10px; width: min(80vw, 960px);
+}
+.topbar.compact { padding: 10px 12px; }
+.topbar.compact .row { width: min(70vw, 840px); }
 input {
-  flex: 1.4; /* biraz daha uzun */
-  padding: 12px 14px; /* biraz inceltildi */
+  flex: 1; /* topbar içinde tam esnesin */
+  padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--stroke);
   outline: none;
@@ -91,18 +87,26 @@ button:hover { filter: saturate(110%); }
 button:active { transform: translateY(1px); }
 button:disabled { opacity:.6; cursor:not-allowed; filter: grayscale(.2); }
 
-#status { min-height:20px; color: var(--muted); font-size:14px; margin-bottom:6px; }
+#status { min-height:20px; color: var(--muted); font-size:14px; margin-bottom:10px; text-align:center; }
 
-/* Sonuçlarda animasyonlu kartlar */
-#sonuc { font-size:16px; line-height:1.7; display:grid; gap: 8px; }
-.result {
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+/* Panel + 3 kutulu sonuç düzeni */
+.panel{ width: min(1200px, 94vw); margin: 24px auto; padding: 0 10px; }
+.city-title{ text-align:center; margin: 16px 0 8px; font-size: clamp(22px, 4vw, 28px); }
+.tiles{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.tile{
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
   border: 1px solid var(--stroke);
-  overflow: hidden;
+  color: var(--text);
+  min-height: 120px;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
   animation: slideFade .5s cubic-bezier(.2,.8,.2,1);
 }
+.tile .label{ color: var(--muted); font-size: 14px; margin-bottom: 6px; }
+.tile .value{ font-size: clamp(24px, 5vw, 36px); font-weight: 700; letter-spacing: .2px; }
+@media (max-width: 860px){ .tiles{ grid-template-columns: 1fr; } }
 @keyframes slideFade { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
 
 .ok { color:#22c55e; }
