@@ -4,11 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hava Durumu</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- Hava durumuna göre arka plan animasyonu -->
   <div id="weatherAnim" class="weather-anim" aria-hidden="true"></div>
+  
+  <!-- Dünya haritası arka plan -->
+  <div id="worldMap" class="world-map" aria-hidden="true"></div>
 
   <!-- En üst arama barı -->
   <div id="topbar" class="topbar">
@@ -18,13 +22,30 @@
     </div>
   </div>
 
-  <!-- Sonuç paneli: başlık + 3 kutu -->
-  <div class="panel">
-    <h1 id="cityTitle" class="city-title">Hava Durumu</h1>
-    <div id="status"></div>
-    <div id="sonuc" class="tiles"></div>
+  <!-- Modern hava durumu paneli -->
+  <div class="weather-container">
+    <!-- Sol taraf: Ana hava durumu -->
+    <div class="main-weather">
+      <div id="locationInfo" class="location-header"></div>
+      <div id="status" class="status"></div>
+      
+      <!-- Büyük sıcaklık ve durum -->
+      <div class="primary-info">
+        <div class="temp-with-icon">
+          <div id="mainTemp" class="main-temperature">--°</div>
+          <div id="weatherIcon" class="small-weather-icon"></div>
+        </div>
+        <div id="mainCondition" class="main-condition">Hava Durumu</div>
+      </div>
+      
+      <!-- Ana detaylar (sıcaklığın altında büyük) -->
+      <div id="weatherDetails" class="main-details"></div>
+    </div>
+    
+
   </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
